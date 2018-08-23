@@ -11,8 +11,6 @@ import io.burt.jmespath.RuntimeConfiguration;
 import io.burt.jmespath.gson.GsonRuntime;
 import io.burt.jmespath.jackson.JacksonRuntime;
 
-;
-
 @RunWith(Enclosed.class)
 public class JmesPathFunctionTest {
   public static class JacksonStringFunctionTest extends JmesPathRuntimeWithStringFunctionTest<JsonNode> {

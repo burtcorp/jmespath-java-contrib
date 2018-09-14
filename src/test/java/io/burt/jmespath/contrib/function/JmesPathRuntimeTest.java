@@ -1,20 +1,31 @@
 package io.burt.jmespath.contrib.function;
 
-import java.util.List;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-
 import io.burt.jmespath.Adapter;
 import io.burt.jmespath.Expression;
 import io.burt.jmespath.JmesPathType;
 import io.burt.jmespath.RuntimeConfiguration;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.junit.Before;
+
+import java.util.List;
 
 public abstract class JmesPathRuntimeTest<T> {
     protected abstract Adapter<T> runtime();
 
     protected abstract Adapter<T> createRuntime(RuntimeConfiguration configuration);
+
+    protected T emptyObject;
+
+    @Before
+    public void setUp() {
+      emptyObject = parse("{}");
+    }
+
+    protected T check(String query) {
+      return search(query, emptyObject);
+    }
 
     protected T search(String query, T input) {
       Expression<T> expression = runtime().compile(query);

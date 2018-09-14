@@ -1,21 +1,19 @@
 package io.burt.jmespath.contrib.function;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.util.regex.PatternSyntaxException;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import io.burt.jmespath.Adapter;
 import io.burt.jmespath.RuntimeConfiguration;
 import io.burt.jmespath.function.ArgumentTypeException;
 import io.burt.jmespath.function.FunctionRegistry;
 import io.burt.jmespath.parser.ParseException;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import java.util.regex.PatternSyntaxException;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathRuntimeTest<T> {
   private FunctionRegistry functionRegistry = FunctionRegistry.defaultRegistry()
@@ -40,35 +38,26 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  private T dontCare, emptyObject, emptyList;
-
-  @Before
-  public void setUp() {
-    emptyObject = parse("{}");
-    emptyList = parse("[]");
-    dontCare = emptyObject;
-  }
-
   @Test
   public void concatJoinsTheParts() {
     functionRegistry.extend();
-    T result1 = search("concat('un', 'grateful')", dontCare);
-    T result2 = search("concat('Ingratitude, ', 'thou ', 'marble-hearted', ' fiend!')", dontCare);
+    T result1 = check("concat('un', 'grateful')");
+    T result2 = check("concat('Ingratitude, ', 'thou ', 'marble-hearted', ' fiend!')");
     assertThat(result1, is(jsonString("ungrateful")));
     assertThat(result2, is(jsonString("Ingratitude, thou marble-hearted fiend!")));
   }
 
   @Test
   public void concatFiltersOutNullTypes() {
-    T result1 = search("concat('Thy ', [], 'old ', `\"groans\"`, \"\", ' ring', ' yet', ' in', ' my', ' ancient',' ears.')", dontCare);
-    T result2 = search("concat('Ciao!',[])", dontCare);
+    T result1 = check("concat('Thy ', [], 'old ', `\"groans\"`, \"\", ' ring', ' yet', ' in', ' my', ' ancient',' ears.')");
+    T result2 = check("concat('Ciao!',[])");
     assertThat(result1, is(jsonString("Thy old groans ring yet in my ancient ears.")));
     assertThat(result2, is(jsonString("Ciao!")));
   }
 
   @Test
   public void concatLiterals() {
-    T result1 = search("concat(`1`, `2`, `3`, `4`, `true`)", dontCare);
+    T result1 = check("concat(`1`, `2`, `3`, `4`, `true`)");
     T result2 = search("concat(`1`, @)", parse("true"));
     assertThat(result1, is(jsonString("1234true")));
     assertThat(result2, is(jsonString("1true")));
@@ -78,12 +67,12 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   public void concatRequiresAtLeastTwoArguments() {
     thrown.expect(ParseException.class);
     thrown.expectMessage(containsString("invalid arity calling \"concat\" (expected at least 2 but was 1)"));
-    search("concat(@)", dontCare);
+    check("concat(@)");
   }
 
   @Test
   public void lowerCaseTranslatesUpperCaseLetter() {
-    T result = search("lower_case('ABc!D')", dontCare);
+    T result = check("lower_case('ABc!D')");
     assertThat(result, is(jsonString("abc!d")));
   }
 
@@ -91,7 +80,7 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   public void lowerCaseRequiresASingleArgument() {
     thrown.expect(ParseException.class);
     thrown.expectMessage(containsString("invalid arity calling \"lower_case\" (expected 1 but was 2)"));
-    search("lower_case(@, @)", dontCare);
+    check("lower_case(@, @)");
   }
 
   @Test
@@ -103,7 +92,7 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
 
   @Test
   public void upperCaseTranslatesLowerCaseLetter() {
-    T result = search("upper_case('abCd0')", dontCare);
+    T result = check("upper_case('abCd0')");
     assertThat(result, is(jsonString("ABCD0")));
   }
 
@@ -111,14 +100,14 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   public void upperCaseRequiresASingleArgument() {
     thrown.expect( ParseException.class);
     thrown.expectMessage(containsString("invalid arity calling \"upper_case\" (expected 1 but was 2)"));
-    search("upper_case(@, @)", dontCare);
+    check("upper_case(@, @)");
   }
 
   @Test
   public void upperCaseRequiresAStringAsArgument() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was object"));
-    search("upper_case(@)", dontCare);
+    check("upper_case(@)");
   }
 
   @Test
@@ -143,43 +132,43 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   public void normalizeSpaceRequiresASingleArgument() {
     thrown.expect( ParseException.class );
     thrown.expectMessage(containsString("invalid arity calling \"normalize_space\" (expected 1 but was 2)"));
-    search("normalize_space(@, @)", dontCare);
+    check("normalize_space(@, @)");
   }
 
   @Test
   public void normalizeSpaceRequiresAStringAsArgument() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was object"));
-    search("normalize_space(@)", dontCare);
+    check("normalize_space(@)");
   }
 
   @Test
   public void translateReplacesMapStringCharactersWithTheirCorrespondingReplacements() {
-    T result = search("translate('bar','abc','ABC')", dontCare);
+    T result = check("translate('bar','abc','ABC')");
     assertThat(result, is(jsonString("BAr")));
   }
 
   @Test
   public void translateRemovesMapStringCharacterIfNoReplacemntCharacterIsGiven() {
-    T result = search("translate('abcabc', 'abc', 'AB')", dontCare);
+    T result = check("translate('abcabc', 'abc', 'AB')");
     assertThat(result, is(jsonString("ABAB")));
   }
 
   @Test
   public void translateLeaveIntactCharactersNotInMapString() {
-    T result = search("translate('foo.xyz', 'abc', '')", dontCare);
+    T result = check("translate('foo.xyz', 'abc', '')");
     assertThat(result, is(jsonString("foo.xyz")));
   }
 
   @Test
   public void translateUsesFirstOccureneInMapString() {
-    T result = search("translate('aaa', 'aaa', 'ABC')", dontCare);
+    T result = check("translate('aaa', 'aaa', 'ABC')");
     assertThat(result, is(jsonString("AAA")));
   }
 
   @Test
   public void translateIgnoresSuperfluousReplacementCharacter() {
-    T result = search("translate('aaa', 'a', 'ABC')", dontCare);
+    T result = check("translate('aaa', 'a', 'ABC')");
     assertThat(result, is(jsonString("AAA")));
   }
 
@@ -187,35 +176,35 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   public void translateRequiresAStringAsFirstArgument() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was object"));
-    search("translate(@, 'foo', 'bar')", dontCare);
+    check("translate(@, 'foo', 'bar')");
   }
 
   @Test
   public void translateRequiresAStringAsSecondArgument() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was object"));
-    search("translate('foo', @, 'bar')", dontCare);
+    check("translate('foo', @, 'bar')");
   }
 
   @Test
   public void translateRequiresAStringAsThirdArgument() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was object"));
-    search("translate('foo', 'bar', @)", dontCare);
+    check("translate('foo', 'bar', @)");
   }
 
   @Test
   public void translateRequiresThreeArgumentsInsteadOfTwo() {
     thrown.expect(ParseException.class);
     thrown.expectMessage(containsString("invalid arity calling \"translate\" (expected 3 but was 2)"));
-    search("translate('foo', 'bar')", dontCare);
+    check("translate('foo', 'bar')");
   }
 
   @Test
   public void translateRequiresThreeArgumentsInsteadOfFour() {
     thrown.expect(ParseException.class);
     thrown.expectMessage(containsString("invalid arity calling \"translate\" (expected 3 but was 4)"));
-    search("translate('foo', 'bar', 'baz', 'woo')", dontCare);
+    check("translate('foo', 'bar', 'baz', 'woo')");
 
   }
 
@@ -223,94 +212,90 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   public void translateRequiresAValue1() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("translate(&foo, 'bar', 'baz')", dontCare);
+    check("translate(&foo, 'bar', 'baz')");
   }
 
   @Test
   public void translateRequiresAValue2() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("translate(&foo, 'bar', 'baz')", dontCare);
+    check("translate(&foo, 'bar', 'baz')");
   }
 
   @Test
   public void translateRequiresAValue3() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("translate('foo', 'bar', &foo)", dontCare);
+    check("translate('foo', 'bar', &foo)");
   }
 
   @Test
   public void substringAfterExamplesFromXpathSpec() {
-    T result1 = search("substring_after('tattoo','tat')", dontCare);
-    T result2 = search("substring_after('tattoo', 'tattoo')", dontCare);
+    T result1 = check("substring_after('tattoo','tat')");
+    T result2 = check("substring_after('tattoo', 'tattoo')");
     T result3 = search("substring_after(@, @)", emptyObject);
-    T result4 = search("substring_after(@, @)", emptyList);
     assertThat(result1, is(jsonString("too")));
     assertThat(result2, is(jsonString("")));
     assertThat(result3, is(jsonString("")));
-    assertThat(result4, is(jsonString("")));
   }
 
   @Test
   public void substringAfterDoesNotSupportCollation_deviationFromXPathSpec() {
     thrown.expect(ParseException.class);
     thrown.expectMessage(containsString("invalid arity calling \"substring_after\" (expected 2 but was 3)"));
-    search("substring_after('abcdefgi','--d-e-', 'http://www.w3.org/2013/collation/UCA?lang=en;alternate=blanked;strength=primary')", dontCare);
+    check("substring_after('abcdefgi','--d-e-', 'http://www.w3.org/2013/collation/UCA?lang=en;alternate=blanked;strength=primary')");
   }
 
   @Test
   public void substringAfterRequiresAValue1() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected any value but was expression"));
-    search("substring_after(&foo, 'bar')", dontCare);
+    check("substring_after(&foo, 'bar')");
   }
 
   @Test
   public void substringAfterRequiresAValue2() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected any value but was expression"));
-    search("substring_after('foo', &foo)", dontCare);
+    check("substring_after('foo', &foo)");
   }
 
   @Test
   public void substringBeforeExamplesFromXpathSpec() {
-    T result1 = search("substring_before('tattoo','attoo')", dontCare);
-    T result2 = search("substring_before('tattoo', 'tatto')", dontCare);
+    T result1 = check("substring_before('tattoo','attoo')");
+    T result2 = check("substring_before('tattoo', 'tatto')");
     T result3 = search("substring_before(@, @)", emptyObject);
-    T result4 = search("substring_before(@, @)", emptyList);
     assertThat(result1, is(jsonString("t")));
     assertThat(result2, is(jsonString("")));
     assertThat(result3, is(jsonString("")));
-    assertThat(result4, is(jsonString("")));
   }
 
   @Test
   public void substringBeforeDoesNotSupportCollation_deviationFromXPathSpec() {
     thrown.expect(ParseException.class);
     thrown.expectMessage(containsString("invalid arity calling \"substring_before\" (expected 2 but was 3)"));
-    search("substring_before('abcdefgi','--d-e-', 'http://www.w3.org/2013/collation/UCA?lang=en;alternate=blanked;strength=primary')", dontCare);
+    check("substring_before('abcdefgi','--d-e-', 'http://www.w3.org/2013/collation/UCA?lang=en;alternate=blanked;strength=primary')");
   }
 
   @Test
   public void substringBeforeRequiresAValue1() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected any value but was expression"));
-    search("substring_before(&foo, 'bar')", dontCare);
+    check("substring_before(&foo, 'bar')");
   }
 
   @Test
   public void substringBeforeRequiresAValue2() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected any value but was expression"));
-    search("substring_before('foo', &foo)", dontCare);
+    check("substring_before('foo', &foo)");
   }
 
   @Test
   public void matchesExamplesFromXPathSpec() {
-    T result1 = search("matches('abracadabra', 'bra')", dontCare);
-    T result2 = search("matches('abracadabra', '^a.*a$')", dontCare);
-    T result3 = search("matches('abracadabra', '^bra')", dontCare);
+    T result1 = check("matches('abracadabra', 'bra')");
+    T result2 = check("matches('abracadabra', '^a.*a$')");
+    T result3 = check("matches('abracadabra', '^bra')");
     assertThat(result1, is(jsonBoolean(true)));
     assertThat(result2, is(jsonBoolean(true)));
     assertThat(result3, is(jsonBoolean(false)));
@@ -318,40 +303,40 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
 
   @Test
   public void matchesReturnsTrueCaseInsensitiveWithIFlag() {
-    T withFlagI = search("matches('A', 'a', 'i')", dontCare);
-    T otherwise = search("matches('A', 'a')", dontCare);
+    T withFlagI = check("matches('A', 'a', 'i')");
+    T otherwise = check("matches('A', 'a')");
     assertThat(withFlagI, is(jsonBoolean(true)));
     assertThat(otherwise, is(jsonBoolean(false)));
   }
 
   @Test
   public void matchesReturnsTrueIfLiterallyMatchesWithQFlag() {
-    T withFlagQ = search("matches('b^az', '^a', 'q')", dontCare);
-    T otherwise = search("matches('b^az', '^a')", dontCare);
+    T withFlagQ = check("matches('b^az', '^a', 'q')");
+    T otherwise = check("matches('b^az', '^a')");
     assertThat(withFlagQ, is(jsonBoolean(true)));
     assertThat(otherwise, is(jsonBoolean(false)));
   }
 
   @Test
   public void matchesReturnsTrueMultilineWithMFlag() {
-    T withFlagM = search("matches('a\nb\nc', '^b$', 'm')", dontCare);
-    T otherwise = search("matches('a\nb\nc', '^b$', '')", dontCare);
+    T withFlagM = check("matches('a\nb\nc', '^b$', 'm')");
+    T otherwise = check("matches('a\nb\nc', '^b$', '')");
     assertThat(withFlagM, is(jsonBoolean(true)));
     assertThat(otherwise, is(jsonBoolean(false)));
   }
 
   @Test
   public void matchesMatchesNewLineWithSFlag() {
-    T withFlagS = search("matches('a\nb\nc', '.b.', 's')", dontCare);
-    T otherwise = search("matches('a\nb\nc', '.b.')", dontCare);
+    T withFlagS = check("matches('a\nb\nc', '.b.', 's')");
+    T otherwise = check("matches('a\nb\nc', '.b.')");
     assertThat(withFlagS, is(jsonBoolean(true)));
     assertThat(otherwise, is(jsonBoolean(false)));
   }
 
   @Test
   public void matchesFlagsCanBeCombined() {
-    T withFlagQ = search("matches('b^az', '^A', 'qi')", dontCare);
-    T otherwise = search("matches('b^az', '^a')", dontCare);
+    T withFlagQ = check("matches('b^az', '^A', 'qi')");
+    T otherwise = check("matches('b^az', '^a')");
     assertThat(withFlagQ, is(jsonBoolean(true)));
     assertThat(otherwise, is(jsonBoolean(false)));
   }
@@ -359,55 +344,55 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   @Test
   public void matchesThrowsPatternSyntaxExceptionOnInvalidPattern() {
     thrown.expect(PatternSyntaxException.class);
-    search("matches('abba', '?')", dontCare);
+    check("matches('abba', '?')");
   }
 
   @Test
   public void matchesThrowsPatternSyntaxExceptionOnZeroMatchingPattern() {
     thrown.expect(PatternSyntaxException.class);
     thrown.expectMessage("pattern matches zero-length string");
-    search("matches('abba', '.?')", dontCare);
+    check("matches('abba', '.?')");
   }
 
   @Test
   public void matchesRequiresAStringValue1() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("matches(&foo, 'bar', 'baz')", emptyObject);
+    check("matches(&foo, 'bar', 'baz')");
   }
 
   @Test
   public void matchesRequiresAStringValue2() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("matches('foo', &bar, 'baz')", emptyObject);
+    check("matches('foo', &bar, 'baz')");
   }
 
   @Test
   public void matchesRequiresAStringValue3() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("matches('foo', 'bar', &baz)", emptyObject);
+    check("matches('foo', 'bar', &baz)");
   }
 
   @Test
   public void replaceReplacesAllOccurrences() {
-    T result1 = search("replace('abracadabra', 'bra', '*')", dontCare);
+    T result1 = check("replace('abracadabra', 'bra', '*')");
     assertThat(result1, is(jsonString("a*cada*")));
   }
 
   @Test
   public void replaceRemovesMatchingPartsIfReplacementIsEmpty() {
-    T result4 = search("replace('abracadabra', 'a', '')", dontCare);
+    T result4 = check("replace('abracadabra', 'a', '')");
     assertThat(result4, is(jsonString("brcdbr")));
   }
 
   @Test
   public void replaceSupportsLazyQualifiers() {
-    T most1 = search("replace('abracadabra', 'a.*a', '*')", dontCare);
-    T lazy1 = search("replace('abracadabra', 'a.*?a', '*') ", dontCare);
-    T most2 = search("replace('AAAA', 'A+', 'b')", dontCare);
-    T lazy2 = search("replace('AAAA', 'A+?', 'b')", dontCare);
+    T most1 = check("replace('abracadabra', 'a.*a', '*')");
+    T lazy1 = check("replace('abracadabra', 'a.*?a', '*') ");
+    T most2 = check("replace('AAAA', 'A+', 'b')");
+    T lazy2 = check("replace('AAAA', 'A+?', 'b')");
     assertThat(most1, is(jsonString("*")));
     assertThat(lazy1, is(jsonString("*c*bra")));
     assertThat(most2, is(jsonString("b")));
@@ -416,151 +401,151 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
 
   @Test
   public void replaceCanReferCapturedGroups() {
-    T result5 = search("replace('abracadabra', 'a(.)', 'a$1$1')", dontCare);
-    T result8 = search("replace('darted', '^(.*?)d(.*)$', '$1c$2')", dontCare);
+    T result5 = check("replace('abracadabra', 'a(.)', 'a$1$1')");
+    T result8 = check("replace('darted', '^(.*?)d(.*)$', '$1c$2')");
     assertThat(result5, is(jsonString("abbraccaddabbra")));
     assertThat(result8, is(jsonString("carted")));
   }
 
   @Test
   public void replaceMatchesCaseInsensitiveWithIFlag() {
-    T withFlagI = search("replace('*A-b-C*', '[a-z]', '', 'i')", dontCare);
-    T otherwise = search("replace('*A-b-C*', '[a-z]', '')", dontCare);
+    T withFlagI = check("replace('*A-b-C*', '[a-z]', '', 'i')");
+    T otherwise = check("replace('*A-b-C*', '[a-z]', '')");
     assertThat(withFlagI, is(jsonString("*--*")));
     assertThat(otherwise, is(jsonString("*A--C*")));
   }
 
   @Test
   public void replaceMatchesLiterallyWithQFlag() {
-    T withFlagQ = search("replace('a.b.c.d', '.', '', 'q')", dontCare);
-    T otherwise = search("replace('a.b.c.d', '.', '')", dontCare);
+    T withFlagQ = check("replace('a.b.c.d', '.', '', 'q')");
+    T otherwise = check("replace('a.b.c.d', '.', '')");
     assertThat(withFlagQ, is(jsonString("abcd")));
     assertThat(otherwise, is(jsonString("")));
   }
 
   @Test
   public void replaceMatchesMultilineWithMFlag() {
-    T withFlagM = search("replace('a\nb\nc', '^\\w$', '', 'm')", dontCare);
-    T otherwise = search("replace('a\nb\nc', '^\\w$', '')", dontCare);
+    T withFlagM = check("replace('a\nb\nc', '^\\w$', '', 'm')");
+    T otherwise = check("replace('a\nb\nc', '^\\w$', '')");
     assertThat(withFlagM, is(jsonString("\n\n")));
     assertThat(otherwise, is(jsonString("a\nb\nc")));
   }
 
   @Test
   public void replaceMatchesNewLineWithSFlag() {
-    T withFlagS = search("replace('a\nb\nc', '.b.', '-B-', 's')", dontCare);
-    T otherwise = search("replace('a\nb\nc', '.b.', '-B-')", dontCare);
+    T withFlagS = check("replace('a\nb\nc', '.b.', '-B-', 's')");
+    T otherwise = check("replace('a\nb\nc', '.b.', '-B-')");
     assertThat(withFlagS, is(jsonString("a-B-c")));
     assertThat(otherwise, is(jsonString("a\nb\nc")));
   }
 
   @Test
   public void replaceFlagsCanBeCombined() {
-    T result = search("replace('a\nB\nc', '.b.', '-B-', 'si')", dontCare);
+    T result = check("replace('a\nB\nc', '.b.', '-B-', 'si')");
     assertThat(result, is(jsonString("a-B-c")));
   }
 
   @Test
   public void replaceThrowsPatternSyntaxExceptionOnInvalidPattern() {
     thrown.expect(PatternSyntaxException.class);
-    search("replace('abba', '?', '')", dontCare);
+    check("replace('abba', '?', '')");
   }
 
   @Test
   public void replaceThrowsPatternSyntaxExceptionOnZeroMatchingPattern() {
     thrown.expect(PatternSyntaxException.class);
     thrown.expectMessage("pattern matches zero-length string");
-    search("replace('abracadabra', '.*?', '$1')", dontCare);
+    check("replace('abracadabra', '.*?', '$1')");
   }
 
   @Test
   public void replaceRequiresAStringValue1() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("replace(&foo, 'bar', 'baz')", emptyObject);
+    check("replace(&foo, 'bar', 'baz')");
   }
 
   @Test
   public void replaceRequiresAStringValue2() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("replace('foo', &bar, 'baz')", emptyObject);
+    check("replace('foo', &bar, 'baz')");
   }
 
   @Test
   public void replaceRequiresAStringValue3() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("replace('foo', 'bar', &baz)", emptyObject);
+    check("replace('foo', 'bar', &baz)");
   }
 
   @Test
   public void replaceRequiresAStringValue4() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("replace('foo', 'bar', 'baz', &woo)", emptyObject);
+    check("replace('foo', 'bar', 'baz', &woo)");
   }
   
   @Test
   public void tokenizeWithoutPatternRemovesSurroundingWhitespacesToo() {
-    T result1 = search("tokenize(' red green blue ')", dontCare);
+    T result1 = check("tokenize(' red green blue ')");
     assertThat(result1, is(jsonArrayOfStrings("red", "green", "blue")));
   }
 
   @Test
   public void tokenizeWithWhitespacePatternSplitsIntoWords() {
-    T result2 = search("tokenize('The cat sat on the mat', '\\s+')", dontCare);
+    T result2 = check("tokenize('The cat sat on the mat', '\\s+')");
     assertThat(result2, is(jsonArrayOfStrings("The", "cat", "sat", "on", "the", "mat")));
   }
 
   @Test
   public void tokenizeWithWhitespacePatternMayProduceEmptyParts() {
-    T result3 = search("tokenize(' red green blue ', '\\s+')", dontCare);
+    T result3 = check("tokenize(' red green blue ', '\\s+')");
     assertThat(result3, is(jsonArrayOfStrings("", "red", "green", "blue", "")));
   }
 
   @Test
   public void tokenizeAllowsCapturingButNotReflectedInResult() {
-    T result7 = search("tokenize('abracadabra', '(ab)|(a)')", dontCare);
+    T result7 = check("tokenize('abracadabra', '(ab)|(a)')");
     assertThat(result7, is(jsonArrayOfStrings("", "r", "c", "d", "r", "")));
   }
 
   @Test
   public void tokenizeMatchesCaseInsensitiveWithIFlag() {
-    T withFlagI = search("tokenize('*A-b-C*', '[a-z]', 'i')", dontCare);
-    T otherwise = search("tokenize('*A-b-C*', '[a-z]')", dontCare);
+    T withFlagI = check("tokenize('*A-b-C*', '[a-z]', 'i')");
+    T otherwise = check("tokenize('*A-b-C*', '[a-z]')");
     assertThat(withFlagI, is(jsonArrayOfStrings("*", "-", "-", "*")));
     assertThat(otherwise, is(jsonArrayOfStrings("*A-", "-C*")));
   }
 
   @Test
   public void tokenizeMatchesLiterallyWithQFlag() {
-    T withFlagQ = search("tokenize('a.b.c.d', '.', 'q')", dontCare);
-    T otherwise = search("tokenize('a.b.c.d', '.')", dontCare);
+    T withFlagQ = check("tokenize('a.b.c.d', '.', 'q')");
+    T otherwise = check("tokenize('a.b.c.d', '.')");
     assertThat(withFlagQ, is(jsonArrayOfStrings("a", "b", "c", "d")));
     assertThat(otherwise, is(jsonArrayOfStrings("", "", "", "", "", "", "", "")));
   }
 
   @Test
   public void tokenizeMatchesMultilineWithMFlag() {
-    T withFlagM = search("tokenize('a\nb\nc', '^\\w$', 'm')", dontCare);
-    T otherwise = search("tokenize('a\nb\nc', '^\\w$')", dontCare);
+    T withFlagM = check("tokenize('a\nb\nc', '^\\w$', 'm')");
+    T otherwise = check("tokenize('a\nb\nc', '^\\w$')");
     assertThat(withFlagM, is(jsonArrayOfStrings("", "\n", "\n", "")));
     assertThat(otherwise, is(jsonArrayOfStrings("a\nb\nc")));
   }
 
   @Test
   public void tokenizeMatchesNewLineWithSFlag() {
-    T withFlagS = search("tokenize('a\nb\nc', '.b.', 's')", dontCare);
-    T otherwise = search("tokenize('a\nb\nc', '.b.')", dontCare);
+    T withFlagS = check("tokenize('a\nb\nc', '.b.', 's')");
+    T otherwise = check("tokenize('a\nb\nc', '.b.')");
     assertThat(withFlagS, is(jsonArrayOfStrings("a", "c")));
     assertThat(otherwise, is(jsonArrayOfStrings("a\nb\nc")));
   }
 
   @Test
   public void tokenizeFlagsCanBeCombined() {
-    T withFlags = search("tokenize('a\nb\nc', '.B.', 'sim')", dontCare);
-    T otherwise = search("tokenize('a\nb\nc', '.B.')", dontCare);
+    T withFlags = check("tokenize('a\nb\nc', '.B.', 'sim')");
+    T otherwise = check("tokenize('a\nb\nc', '.B.')");
     assertThat(withFlags, is(jsonArrayOfStrings("a", "c")));
     assertThat(otherwise, is(jsonArrayOfStrings("a\nb\nc")));
   }
@@ -568,34 +553,34 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   @Test
   public void tokenizeThrowsPatternSyntaxExceptionOnInvalidPattern() {
     thrown.expect(PatternSyntaxException.class);
-    search("tokenize('abba', '?')", dontCare);
+    check("tokenize('abba', '?')");
   }
 
   @Test
   public void tokenizeThrowsPatternSyntaxExceptionOnZeroMatchingPattern() {
     thrown.expect(PatternSyntaxException.class);
     thrown.expectMessage("pattern matches zero-length string");
-    search("tokenize('abba', '.?')", dontCare);
+    check("tokenize('abba', '.?')");
   }
 
   @Test
   public void tokenizeRequiresAStringValue1() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("tokenize(&foo, 'bar', 'baz')", emptyObject);
+    check("tokenize(&foo, 'bar', 'baz')");
   }
 
   @Test
   public void tokenizeRequiresAStringValue2() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("tokenize('foo', &bar, 'baz')", emptyObject);
+    check("tokenize('foo', &bar, 'baz')");
   }
 
   @Test
   public void tokenizeRequiresAStringValue3() {
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
-    search("tokenize('foo', 'bar', &baz)", emptyObject);
+    check("tokenize('foo', 'bar', &baz)");
   }
 }

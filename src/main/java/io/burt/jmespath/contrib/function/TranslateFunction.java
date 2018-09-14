@@ -31,7 +31,7 @@ public class TranslateFunction extends SubstringMatchingFunction {
    * This is map-based reimplementation of org.apache.commons.lang.StringUtils.replaceChars
    */
   protected static String replaceChars(String input, String from, String to) {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     Map<Character, Character> map = buildTranslationMap(from, to);
 
     for (int i = 0; i < input.length(); ++i) {
@@ -49,7 +49,7 @@ public class TranslateFunction extends SubstringMatchingFunction {
   }
 
   private static Map<Character, Character> buildTranslationMap(String from, String to) {
-    Map<Character, Character> map = new HashMap();
+    Map<Character, Character> map = new HashMap<>();
     for (int i = 0; i < from.length(); ++i) {
       map.put(from.charAt(i), i < to.length() ? to.charAt(i) : null);
     }

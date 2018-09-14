@@ -16,10 +16,9 @@ public class ConcatFunction extends BaseFunction {
 
   @Override
   protected <T> T callFunction(Adapter<T> runtime, List<FunctionArgument<T>> arguments) {
-    StringBuffer sb = new StringBuffer();
-    Iterator<FunctionArgument<T>> args = arguments.iterator();
-    while (args.hasNext()) {
-      T value = args.next().value();
+    StringBuilder sb = new StringBuilder();
+    for (FunctionArgument<T> arg: arguments) {
+      T value = arg.value();
       if (runtime.typeOf(value) != JmesPathType.NULL) {
         sb.append(runtime.toString(value));
       }

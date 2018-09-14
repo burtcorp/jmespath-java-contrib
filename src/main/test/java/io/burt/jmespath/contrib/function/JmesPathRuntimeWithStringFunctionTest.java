@@ -496,26 +496,20 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   }
 
   @Test
-  public void tokenizeWithWhitespacePatternMayProduceEmptyParts_ThirdExampleFromXpathSpec() {
-    T result3 = search("tokenize(' red green blue ', '\\s+')", dontCare);
-    assertThat(result3, is(jsonArrayOfStrings("", "red", "green", "blue", "")));
-  }
-
-  @Test
   public void tokenizeWithWhitespacePatternSplitsIntoWords_SecondExampleFromXPathSpec() {
     T result2 = search("tokenize('The cat sat on the mat', '\\s+')", dontCare);
     assertThat(result2, is(jsonArrayOfStrings("The", "cat", "sat", "on", "the", "mat")));
   }
 
   @Test
-  public void tokenizeRemainingExamplesFromXPathSpec() {
-    T result4 = search("tokenize('1, 15, 24, 50', ',\\s*')", dontCare);
-    T result5 = search("tokenize('1,15,,24,50,', ',')", dontCare);
-    T result6 = search("tokenize('Some unparsed <br> HTML <BR> text', '\\s*<br>\\s*', 'i')", dontCare);
+  public void tokenizeWithWhitespacePatternMayProduceEmptyParts_ThirdExampleFromXpathSpec() {
+    T result3 = search("tokenize(' red green blue ', '\\s+')", dontCare);
+    assertThat(result3, is(jsonArrayOfStrings("", "red", "green", "blue", "")));
+  }
+
+  @Test
+  public void tokenizeAllowsCapturingButNotReflectedInResult() {
     T result7 = search("tokenize('abracadabra', '(ab)|(a)')", dontCare);
-    assertThat(result4, is(jsonArrayOfStrings("1", "15", "24", "50")));
-    assertThat(result5, is(jsonArrayOfStrings("1", "15", "", "24", "50", "")));
-    assertThat(result6, is(jsonArrayOfStrings("Some unparsed", "HTML", "text")));
     assertThat(result7, is(jsonArrayOfStrings("", "r", "c", "d", "r", "")));
   }
 

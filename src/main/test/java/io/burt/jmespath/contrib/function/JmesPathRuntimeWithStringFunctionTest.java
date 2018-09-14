@@ -48,11 +48,7 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
     emptyList = parse("[]");
     dontCare = emptyObject;
   }
-  /**
-   * The following test cases are inspired by the examples of the related functions from XPath Function Specification:
-   * https://www.w3.org/TR/xpath-functions-31/
-   * Those examples just illustrate the statements of specification rules and are considered as non-normative.
-   */
+
   @Test
   public void concatJoinsTheParts() {
     functionRegistry.extend();
@@ -72,7 +68,7 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
 
   @Test
   public void concatLiterals() {
-    T result1 = search("concat(`1`, `2`, `3`, `4`, `true`)", parse("{}"));
+    T result1 = search("concat(`1`, `2`, `3`, `4`, `true`)", dontCare);
     T result2 = search("concat(`1`, @)", parse("true"));
     assertThat(result1, is(jsonString("1234true")));
     assertThat(result2, is(jsonString("1true")));
@@ -82,11 +78,11 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   public void concatRequiresAtLeastTwoArguments() {
     thrown.expect(ParseException.class);
     thrown.expectMessage(containsString("invalid arity calling \"concat\" (expected at least 2 but was 1)"));
-    search("concat(@)", parse("{}"));
+    search("concat(@)", dontCare);
   }
 
   @Test
-  public void lowerCaseExampleFromXPathSpec() {
+  public void lowerCaseTranslatesUpperCaseLetter() {
     T result = search("lower_case('ABc!D')", dontCare);
     assertThat(result, is(jsonString("abc!d")));
   }
@@ -106,7 +102,7 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   }
 
   @Test
-  public void upperCaseExamplesFromXPathSpec() {
+  public void upperCaseTranslatesLowerCaseLetter() {
     T result = search("upper_case('abCd0')", dontCare);
     assertThat(result, is(jsonString("ABCD0")));
   }

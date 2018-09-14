@@ -502,19 +502,19 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   }
   
   @Test
-  public void tokenizeWithoutPatternRemovesSurroundingWhitespacesToo_FirstExampleFromXpathSpec() {
+  public void tokenizeWithoutPatternRemovesSurroundingWhitespacesToo() {
     T result1 = search("tokenize(' red green blue ')", dontCare);
     assertThat(result1, is(jsonArrayOfStrings("red", "green", "blue")));
   }
 
   @Test
-  public void tokenizeWithWhitespacePatternSplitsIntoWords_SecondExampleFromXPathSpec() {
+  public void tokenizeWithWhitespacePatternSplitsIntoWords() {
     T result2 = search("tokenize('The cat sat on the mat', '\\s+')", dontCare);
     assertThat(result2, is(jsonArrayOfStrings("The", "cat", "sat", "on", "the", "mat")));
   }
 
   @Test
-  public void tokenizeWithWhitespacePatternMayProduceEmptyParts_ThirdExampleFromXpathSpec() {
+  public void tokenizeWithWhitespacePatternMayProduceEmptyParts() {
     T result3 = search("tokenize(' red green blue ', '\\s+')", dontCare);
     assertThat(result3, is(jsonArrayOfStrings("", "red", "green", "blue", "")));
   }

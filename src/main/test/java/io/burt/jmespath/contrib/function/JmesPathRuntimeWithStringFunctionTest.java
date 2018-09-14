@@ -122,13 +122,6 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   }
 
   @Test
-  public void normalizeSpaceExamplesFromXPathSpec() {
-    T result = search("normalize_space(@)", parse("\" The    wealthy curled darlings\\n" +
-            "                             of    our    nation. \""));
-    assertThat(result, is(jsonString("The wealthy curled darlings of our nation.")));
-  }
-
-  @Test
   public void normalizeSpaceRemovesLeadingWhitespaces() {
     T result = search("normalize_space(str)", parse("{ \"str\" : \"\\n\\t \\tend\"}"));
     assertThat(result, is(jsonString("end")));

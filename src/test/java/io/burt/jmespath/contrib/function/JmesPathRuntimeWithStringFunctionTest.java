@@ -391,22 +391,34 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   }
 
   @Test
-  public void replaceExamplesFromXpathSpec() {
+  public void replaceReplacesAllOccurrences() {
     T result1 = search("replace('abracadabra', 'bra', '*')", dontCare);
-    T result2 = search("replace('abracadabra', 'a.*a', '*')", dontCare);
-    T result3 = search("replace('abracadabra', 'a.*?a', '*') ", dontCare);
-    T result4 = search("replace('abracadabra', 'a', '')", dontCare);
-    T result5 = search("replace('abracadabra', 'a(.)', 'a$1$1')", dontCare);
-    T result6 = search("replace('AAAA', 'A+', 'b')", dontCare);
-    T result7 = search("replace('AAAA', 'A+?', 'b')", dontCare);
-    T result8 = search("replace('darted', '^(.*?)d(.*)$', '$1c$2')", dontCare);
     assertThat(result1, is(jsonString("a*cada*")));
-    assertThat(result2, is(jsonString("*")));
-    assertThat(result3, is(jsonString("*c*bra")));
+  }
+
+  @Test
+  public void replaceRemovesMatchingPartsIfReplacementIsEmpty() {
+    T result4 = search("replace('abracadabra', 'a', '')", dontCare);
     assertThat(result4, is(jsonString("brcdbr")));
+  }
+
+  @Test
+  public void replaceSupportsLazyQualifiers() {
+    T most1 = search("replace('abracadabra', 'a.*a', '*')", dontCare);
+    T lazy1 = search("replace('abracadabra', 'a.*?a', '*') ", dontCare);
+    T most2 = search("replace('AAAA', 'A+', 'b')", dontCare);
+    T lazy2 = search("replace('AAAA', 'A+?', 'b')", dontCare);
+    assertThat(most1, is(jsonString("*")));
+    assertThat(lazy1, is(jsonString("*c*bra")));
+    assertThat(most2, is(jsonString("b")));
+    assertThat(lazy2, is(jsonString("bbbb")));
+  }
+
+  @Test
+  public void replaceCanReferCapturedGroups() {
+    T result5 = search("replace('abracadabra', 'a(.)', 'a$1$1')", dontCare);
+    T result8 = search("replace('darted', '^(.*?)d(.*)$', '$1c$2')", dontCare);
     assertThat(result5, is(jsonString("abbraccaddabbra")));
-    assertThat(result6, is(jsonString("b")));
-    assertThat(result7, is(jsonString("bbbb")));
     assertThat(result8, is(jsonString("carted")));
   }
 

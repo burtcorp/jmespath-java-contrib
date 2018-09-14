@@ -168,7 +168,7 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   @Test
   public void translateLeaveIntactCharactersNotInMapString() {
     T result = search("translate('foo.xyz', 'abc', '')", dontCare);
-    assertThat(result, is(jsonString("ABdAB")));
+    assertThat(result, is(jsonString("foo.xyz")));
   }
 
   @Test

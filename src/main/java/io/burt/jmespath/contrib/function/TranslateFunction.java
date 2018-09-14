@@ -27,9 +27,6 @@ public class TranslateFunction extends SubstringMatchingFunction {
     }
   }
 
-  /**
-   * This is map-based reimplementation of org.apache.commons.lang.StringUtils.replaceChars
-   */
   protected static String replaceChars(String input, String from, String to) {
     StringBuilder sb = new StringBuilder();
     Map<Character, Character> map = buildTranslationMap(from, to);

@@ -48,7 +48,10 @@ public class TranslateFunction extends SubstringMatchingFunction {
   private static Map<Character, Character> buildTranslationMap(String from, String to) {
     Map<Character, Character> map = new HashMap<>();
     for (int i = 0; i < from.length(); ++i) {
-      map.put(from.charAt(i), i < to.length() ? to.charAt(i) : null);
+      Character ch  = from.charAt(i);
+      if (!map.containsKey(ch)) {
+        map.put(from.charAt(i), i < to.length() ? to.charAt(i) : null);
+      }
     }
     return map;
   }

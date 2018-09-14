@@ -165,13 +165,33 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
   }
 
   @Test
-  public void translateExamplesFromXpathSpec() {
-    T result1 = search("translate('bar','abc','ABC')", dontCare);
-    T result2 = search("translate('--aaa--', 'abc-', 'ABC')", dontCare);
-    T result3 = search("translate('abcdabc', 'abc', 'AB')", dontCare);
-    assertThat(result1, is(jsonString("BAr")));
-    assertThat(result2, is(jsonString("AAA")));
-    assertThat(result3, is(jsonString("ABdAB")));
+  public void translateReplacesMapStringCharactersWithTheirCorrespondingReplacements() {
+    T result = search("translate('bar','abc','ABC')", dontCare);
+    assertThat(result, is(jsonString("BAr")));
+  }
+
+  @Test
+  public void translateRemovesMapStringCharacterIfNoReplacemntCharacterIsGiven() {
+    T result = search("translate('abcabc', 'abc', 'AB')", dontCare);
+    assertThat(result, is(jsonString("ABAB")));
+  }
+
+  @Test
+  public void translateLeaveIntactCharactersNotInMapString() {
+    T result = search("translate('foo.xyz', 'abc', '')", dontCare);
+    assertThat(result, is(jsonString("ABdAB")));
+  }
+
+  @Test
+  public void translateUsesFirstOccureneInMapString() {
+    T result = search("translate('aaa', 'aaa', 'ABC')", dontCare);
+    assertThat(result, is(jsonString("AAA")));
+  }
+
+  @Test
+  public void translateIgnoresSuperfluousReplacementCharacter() {
+    T result = search("translate('aaa', 'a', 'ABC')", dontCare);
+    assertThat(result, is(jsonString("AAA")));
   }
 
   @Test

@@ -19,14 +19,14 @@ public class TokenizeFunction extends RegularExpressionFunction {
     List<T> result = new LinkedList<>();
     Pattern pattern = (arguments.size() > 1) ? getPattern(runtime, arguments) : Pattern.compile("\\s+");
     for (String parts: pattern.split(getInputString(runtime, arguments), -1)) {
-      /*
-       * if arguments.size == 1 then leading and trailing empty parts has to be discarded
-       * but the pattern above ensures that nowhere else such an empty part may occur.
-       */
-      if (1 < arguments.size() || !isEmpty(parts)) {
+      if (customPattern(arguments) || !isEmpty(parts)) {
         result.add(runtime.createString(parts));
       }
     }
     return runtime.createArray(result);
+  }
+
+  private <T> boolean customPattern(List<FunctionArgument<T>> arguments) {
+    return 1 < arguments.size();
   }
 }

@@ -17,16 +17,16 @@ import static org.junit.Assert.assertThat;
 
 public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathRuntimeTest<T> {
   private FunctionRegistry functionRegistry = FunctionRegistry.defaultRegistry()
-          .extend(new ConcatFunction())
-          .extend(new LowerCaseFunction())
-          .extend(new MatchesFunction())
-          .extend(new NormalizeSpaceFunction())
-          .extend(new ReplaceFunction())
-          .extend(new SubstringAfterFunction())
-          .extend(new SubstringBeforeFunction())
-          .extend(new TokenizeFunction())
-          .extend(new TranslateFunction())
-          .extend(new UpperCaseFunction());
+          .extend(new ConcatFunction(),
+                  new LowerCaseFunction(),
+                  new MatchesFunction(),
+                  new NormalizeSpaceFunction(),
+                  new ReplaceFunction(),
+                  new SubstringAfterFunction(),
+                  new SubstringBeforeFunction(),
+                  new TokenizeFunction(),
+                  new TranslateFunction(),
+                  new UpperCaseFunction());
 
   private Adapter<T> runtime = createRuntime(RuntimeConfiguration.builder()
           .withFunctionRegistry(functionRegistry)

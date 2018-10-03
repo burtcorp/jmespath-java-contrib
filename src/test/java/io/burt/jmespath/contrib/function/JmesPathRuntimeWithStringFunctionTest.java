@@ -17,16 +17,16 @@ import static org.junit.Assert.assertThat;
 
 public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathRuntimeTest<T> {
   private FunctionRegistry functionRegistry = FunctionRegistry.defaultRegistry()
-          .extend(new ConcatFunction())
-          .extend(new LowerCaseFunction())
-          .extend(new MatchesFunction())
-          .extend(new NormalizeSpaceFunction())
-          .extend(new ReplaceFunction())
-          .extend(new SubstringAfterFunction())
-          .extend(new SubstringBeforeFunction())
-          .extend(new TokenizeFunction())
-          .extend(new TranslateFunction())
-          .extend(new UpperCaseFunction());
+          .extend(new ConcatFunction(),
+                  new LowerCaseFunction(),
+                  new MatchesFunction(),
+                  new NormalizeSpaceFunction(),
+                  new ReplaceFunction(),
+                  new SubstringAfterFunction(),
+                  new SubstringBeforeFunction(),
+                  new TokenizeFunction(),
+                  new TranslateFunction(),
+                  new UpperCaseFunction());
 
   private Adapter<T> runtime = createRuntime(RuntimeConfiguration.builder()
           .withFunctionRegistry(functionRegistry)
@@ -98,7 +98,7 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
 
   @Test
   public void upperCaseRequiresASingleArgument() {
-    thrown.expect( ParseException.class);
+    thrown.expect(ParseException.class);
     thrown.expectMessage(containsString("invalid arity calling \"upper_case\" (expected 1 but was 2)"));
     check("upper_case(@, @)");
   }
@@ -130,7 +130,7 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
 
   @Test
   public void normalizeSpaceRequiresASingleArgument() {
-    thrown.expect( ParseException.class );
+    thrown.expect(ParseException.class);
     thrown.expectMessage(containsString("invalid arity calling \"normalize_space\" (expected 1 but was 2)"));
     check("normalize_space(@, @)");
   }
@@ -205,7 +205,6 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
     thrown.expect(ParseException.class);
     thrown.expectMessage(containsString("invalid arity calling \"translate\" (expected 3 but was 4)"));
     check("translate('foo', 'bar', 'baz', 'woo')");
-
   }
 
   @Test

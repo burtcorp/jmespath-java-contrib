@@ -26,7 +26,11 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
                   new SubstringBeforeFunction(),
                   new TokenizeFunction(),
                   new TranslateFunction(),
-                  new UpperCaseFunction());
+                  new UpperCaseFunction(),
+                  new AddFunction(),
+                  new SubtractFunction(),
+                  new MultipleFunction(),
+                  new DivideFunction());
 
   private Adapter<T> runtime = createRuntime(RuntimeConfiguration.builder()
           .withFunctionRegistry(functionRegistry)
@@ -581,5 +585,133 @@ public abstract class JmesPathRuntimeWithStringFunctionTest<T> extends JmesPathR
     thrown.expect(ArgumentTypeException.class);
     thrown.expectMessage(containsString("expected string but was expression"));
     check("tokenize('foo', 'bar', &baz)");
+  }
+
+  @Test
+  public void addTwoConstants() {
+    T result = check("add(`5`, `5`)");
+    assertThat(result, is(jsonNumber(10)));
+  }
+
+  @Test
+  public void addFieldToConstant() {
+    T result = search("add(num, `5`)", parse("{ \"num\" : 5}"));
+    assertThat(result, is(jsonNumber(10)));
+  }
+
+  @Test
+  public void addTwoFields() {
+    T result = search("add(num1, num2)", parse("{ \"num1\" : 5, \"num2\" : 5}"));
+    assertThat(result, is(jsonNumber(10)));
+  }
+
+  @Test
+  public void addRequiresTwoArgument() {
+    thrown.expect(ParseException.class);
+    thrown.expectMessage(containsString("invalid arity calling \"add\" (expected 2 but was 1)"));
+    check("add(@)");
+  }
+
+  @Test
+  public void addRequiresNumericArguments() {
+    thrown.expect(ArgumentTypeException.class);
+    thrown.expectMessage(containsString("expected number but was array"));
+    search("add(@, `5`)", parse("[3]"));
+  }
+
+  @Test
+  public void subtractTwoConstants() {
+    T result = check("subtract(`5`, `5`)");
+    assertThat(result, is(jsonNumber(0)));
+  }
+
+  @Test
+  public void subtractFieldToConstant() {
+    T result = search("subtract(num, `5`)", parse("{ \"num\" : 5}"));
+    assertThat(result, is(jsonNumber(0)));
+  }
+
+  @Test
+  public void subtractTwoFields() {
+    T result = search("subtract(num1, num2)", parse("{ \"num1\" : 5, \"num2\" : 5}"));
+    assertThat(result, is(jsonNumber(0)));
+  }
+
+  @Test
+  public void subtractRequiresTwoArgument() {
+    thrown.expect(ParseException.class);
+    thrown.expectMessage(containsString("invalid arity calling \"subtract\" (expected 2 but was 1)"));
+    check("subtract(@)");
+  }
+
+  @Test
+  public void subtractRequiresNumericArguments() {
+    thrown.expect(ArgumentTypeException.class);
+    thrown.expectMessage(containsString("expected number but was array"));
+    search("subtract(@, `5`)", parse("[3]"));
+  }
+
+  @Test
+  public void multipleTwoConstants() {
+    T result = check("multiple(`5`, `5`)");
+    assertThat(result, is(jsonNumber(25)));
+  }
+
+  @Test
+  public void multipleFieldToConstant() {
+    T result = search("multiple(num, `5`)", parse("{ \"num\" : 5}"));
+    assertThat(result, is(jsonNumber(25)));
+  }
+
+  @Test
+  public void multipleTwoFields() {
+    T result = search("multiple(num1, num2)", parse("{ \"num1\" : 5, \"num2\" : 5}"));
+    assertThat(result, is(jsonNumber(25)));
+  }
+
+  @Test
+  public void multipleRequiresTwoArgument() {
+    thrown.expect(ParseException.class);
+    thrown.expectMessage(containsString("invalid arity calling \"multiple\" (expected 2 but was 1)"));
+    check("multiple(@)");
+  }
+
+  @Test
+  public void multipleRequiresNumericArguments() {
+    thrown.expect(ArgumentTypeException.class);
+    thrown.expectMessage(containsString("expected number but was array"));
+    search("multiple(@, `5`)", parse("[3]"));
+  }
+
+  @Test
+  public void divideTwoConstants() {
+    T result = check("divide(`5`, `5`)");
+    assertThat(result, is(jsonNumber(1)));
+  }
+
+  @Test
+  public void divideFieldToConstant() {
+    T result = search("divide(num, `5`)", parse("{ \"num\" : 5}"));
+    assertThat(result, is(jsonNumber(1)));
+  }
+
+  @Test
+  public void divideTwoFields() {
+    T result = search("divide(num1, num2)", parse("{ \"num1\" : 5, \"num2\" : 5}"));
+    assertThat(result, is(jsonNumber(1)));
+  }
+
+  @Test
+  public void divideRequiresTwoArgument() {
+    thrown.expect(ParseException.class);
+    thrown.expectMessage(containsString("invalid arity calling \"divide\" (expected 2 but was 1)"));
+    check("divide(@)");
+  }
+
+  @Test
+  public void divideRequiresNumericArguments() {
+    thrown.expect(ArgumentTypeException.class);
+    thrown.expectMessage(containsString("expected number but was array"));
+    search("divide(@, `5`)", parse("[3]"));
   }
 }

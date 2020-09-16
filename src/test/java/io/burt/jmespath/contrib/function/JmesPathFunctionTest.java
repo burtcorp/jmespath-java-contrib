@@ -22,4 +22,14 @@ public class JmesPathFunctionTest {
     @Override
     protected Adapter<JsonElement> createRuntime(RuntimeConfiguration configuration) { return new GsonRuntime(configuration); }
   }
+
+  public static class JacksonMathFunctionTest extends JmesPathRuntimeWithMathFunctionTest<JsonNode> {
+    @Override
+    protected Adapter<JsonNode> createRuntime(RuntimeConfiguration configuration) { return new JacksonRuntime(configuration); }
+  }
+
+  public static class GsonMathFunctionTest extends JmesPathRuntimeWithMathFunctionTest<JsonElement> {
+    @Override
+    protected Adapter<JsonElement> createRuntime(RuntimeConfiguration configuration) { return new GsonRuntime(configuration); }
+  }
 }

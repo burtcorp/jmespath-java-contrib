@@ -26,7 +26,12 @@ public abstract class MathBiFunction extends BaseFunction {
     T valueY = arguments.get(1).value();
     double x = runtime.toNumber(valueX).doubleValue();
     double y = runtime.toNumber(valueY).doubleValue();
-    return runtime.createNumber(performMathOperation(x, y));
+    double result = performMathOperation(x, y);
+    if (!Double.isInfinite(result)) {
+      return runtime.createNumber(result);
+    } else {
+      return runtime.createNull();
+    }
   }
 
   /**

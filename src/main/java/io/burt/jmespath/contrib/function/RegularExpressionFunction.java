@@ -36,9 +36,6 @@ public abstract class RegularExpressionFunction extends SubstringMatchingFunctio
     return runtime.toString(arguments.get(i).value());
   }
 
-  /**
-   * Subclasses may override these methods if parameter positions are different than usual.
-   */
   protected int inputArgumentPosition() {
     return 0;
   }

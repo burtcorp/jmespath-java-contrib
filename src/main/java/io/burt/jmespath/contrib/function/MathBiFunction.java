@@ -34,8 +34,5 @@ public abstract class MathBiFunction extends BaseFunction {
     }
   }
 
-  /**
-   * Subclasses implement this method.
-   */
   protected abstract double performMathOperation(double x, double y);
 }

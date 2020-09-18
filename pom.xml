@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>jmespath-contrib</artifactId>
-  <version>0.3.1-SNAPSHOT</version>
+  <version>0.4.0</version>
   <name>JMESPath Contributions</name>
   <description>Community contributed extensions to JMESPath for Java</description>
 
@@ -18,7 +18,7 @@
     <connection>scm:git:ssh://git@github.com/burtcorp/jmespath-java-contrib.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/burtcorp/jmespath-java-contrib.git</developerConnection>
     <url>https://github.com/burtcorp/jmespath-java-contrib.git</url>
-    <tag>jmespath-contrib-${project.version}</tag>
+    <tag>jmespath-contrib-0.4.0</tag>
   </scm>
 
   <properties>
